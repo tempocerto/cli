@@ -774,12 +774,19 @@ func flagFromFileEnv(filePath, envName string) (val string, ok bool) {
 	for _, envVar := range strings.Split(envName, ",") {
 		envVar = strings.TrimSpace(envVar)
 		if envVal, ok := syscall.Getenv(envVar); ok {
+			if envVal == "" {
+				return "", false
+			}
 			return envVal, true
 		}
 	}
 	for _, fileVar := range strings.Split(filePath, ",") {
 		if data, err := ioutil.ReadFile(fileVar); err == nil {
-			return string(data), true
+			dataStr := string(data)
+			if dataStr == "" {
+				return "", false
+			}
+			return dataStr, true
 		}
 	}
 	return "", false
